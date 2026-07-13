@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reel Log — Details</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <div id="page-loading" class="page-loader"><div class="spinner spinner-lg"></div></div>
+
+  <main id="details-root" style="display:none;">
+    <section class="details-hero" id="details-hero">
+      <a href="library.html" class="btn btn-icon btn-outline details-hero__back" aria-label="Back to library">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+      </a>
+      <div class="details-hero__backdrop" id="hero-backdrop"></div>
+      <div class="details-hero__scrim"></div>
+      <div class="details-hero__scrim-side"></div>
+      <div class="container details-hero__content">
+        <div class="details-hero__row">
+          <img class="details-hero__poster" id="hero-poster" alt="" />
+          <div class="details-hero__info">
+            <h1 class="details-hero__title" id="hero-title"></h1>
+            <p class="details-hero__original" id="hero-original" style="display:none;"></p>
+            <div class="details-hero__meta-row">
+              <span class="badge badge-gold" id="hero-type"></span>
+              <span class="badge" id="hero-year"></span>
+              <span class="badge" id="hero-runtime"></span>
+              <span class="badge" id="hero-status"></span>
+              <span class="badge" id="hero-rating"></span>
+            </div>
+            <div class="details-hero__genres" id="hero-genres"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container details-body">
+      <div class="details-grid">
+        <!-- Left column: metadata -->
+        <div>
+          <div class="details-section">
+            <h3>Overview</h3>
+            <p class="overview-text" id="overview-text"></p>
+          </div>
+
+          <div class="details-section" id="cast-section">
+            <h3>Cast</h3>
+            <div class="cast-scroll" id="cast-scroll"></div>
+          </div>
+
+          <div class="details-section" id="seasons-section" style="display:none;">
+            <h3>Seasons</h3>
+            <div class="season-list" id="season-list"></div>
+          </div>
+
+          <div class="details-section">
+            <h3>Production</h3>
+            <p id="production-companies" style="color:var(--text-muted);"></p>
+          </div>
+        </div>
+
+        <!-- Right column: your tracking + info -->
+        <div>
+          <div class="info-card" id="your-tracking-card">
+            <h3 style="margin-bottom:16px;">Your Tracking</h3>
+
+            <div style="display:flex; align-items:center; gap:16px; margin-bottom:18px;">
+              <div class="rating-ring" id="rating-ring">
+                <div class="rating-ring__track" id="rating-ring-track"></div>
+                <div class="rating-ring__value" id="rating-ring-value">—</div>
+              </div>
+              <div style="flex:1;">
+                <label class="hint" style="display:block; margin-bottom:6px;">Your rating (0–10, halves allowed)</label>
+                <input class="input" type="range" id="my-rating" min="0" max="10" step="0.5" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="watch-status">Watch status</label>
+              <select class="select" id="watch-status">
+                <option value="plan_to_watch">Plan to Watch</option>
+                <option value="watching">Watching</option>
+                <option value="completed">Completed</option>
+                <option value="on_hold">On Hold</option>
+                <option value="dropped">Dropped</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="date-watched">Date watched</label>
+                <input class="input" type="date" id="date-watched" />
+              </div>
+              <div class="field">
+                <label for="rewatch-count">Rewatch count</label>
+                <input class="input" type="number" id="rewatch-count" min="0" step="1" />
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="checkbox-row">
+                <input type="checkbox" id="favorite-toggle" />
+                <label for="favorite-toggle" style="text-transform:none; letter-spacing:0; font-weight:500; color:var(--text);">Mark as favorite</label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="notes">Notes</label>
+              <textarea class="textarea" id="notes" placeholder="Your thoughts, quotes, anything you want to remember…"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="tag-input">Tags</label>
+              <div class="tag-input-wrap" id="tag-input-wrap">
+                <input type="text" id="tag-input" placeholder="Add a tag and press Enter" />
+              </div>
+            </div>
+
+            <div class="form-error" id="save-error"></div>
+
+            <div style="display:flex; gap:10px; margin-top:6px;">
+              <button class="btn btn-primary btn-block" id="save-btn">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h3 style="margin-bottom:10px;">Details</h3>
+            <div class="info-card__row"><span class="info-card__row-label">Release</span><span class="info-card__row-value" id="info-release"></span></div>
+            <div class="info-card__row"><span class="info-card__row-label">Runtime</span><span class="info-card__row-value" id="info-runtime"></span></div>
+            <div class="info-card__row"><span class="info-card__row-label">Seasons</span><span class="info-card__row-value" id="info-seasons"></span></div>
+            <div class="info-card__row"><span class="info-card__row-label">Episodes</span><span class="info-card__row-value" id="info-episodes"></span></div>
+            <div class="info-card__row"><span class="info-card__row-label">Status</span><span class="info-card__row-value" id="info-status"></span></div>
+            <div class="info-card__row"><span class="info-card__row-label">Language</span><span class="info-card__row-value" id="info-language"></span></div>
+            <div class="info-card__row"><span class="info-card__row-label">TMDb Rating</span><span class="info-card__row-value" id="info-tmdb-rating"></span></div>
+            <div class="info-card__row"><span class="info-card__row-label">Added to library</span><span class="info-card__row-value" id="info-date-added"></span></div>
+          </div>
+
+          <button class="btn btn-danger btn-block" id="delete-btn">Remove from Library</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <script type="module" src="js/details.js"></script>
+</body>
+</html>

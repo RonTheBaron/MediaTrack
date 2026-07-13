@@ -1,0 +1,145 @@
+/* ==========================================================================
+   BASE.CSS — Design tokens, reset, typography
+   Theme: "Screening Room" — near-black cinema palette, gold film-reel accent,
+   teal secondary, condensed display type for titles (poster-like), clean
+   sans body type for reading. Dark by default (no light theme requested).
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---- Color: surfaces ---- */
+  --bg: #0a0b0f;
+  --bg-elevated: #101319;
+  --surface: #161a23;
+  --surface-hover: #1e2330;
+  --surface-2: #1b1f29;
+  --border: #262b38;
+  --border-soft: #1e222c;
+
+  /* ---- Color: text ---- */
+  --text: #edeef2;
+  --text-muted: #99a0b0;
+  --text-dim: #5c6270;
+
+  /* ---- Color: accents ---- */
+  --gold: #d4a843;
+  --gold-bright: #e9c165;
+  --gold-dim: #8a6f2f;
+  --teal: #3fbfae;
+  --teal-dim: #2a8578;
+  --red: #e5484d;
+  --red-dim: #8f2c2f;
+
+  /* ---- Gradients ---- */
+  --scrim: linear-gradient(180deg, rgba(10,11,15,0) 0%, rgba(10,11,15,0.55) 55%, rgba(10,11,15,0.97) 100%);
+  --scrim-side: linear-gradient(90deg, rgba(10,11,15,0.95) 0%, rgba(10,11,15,0.35) 45%, rgba(10,11,15,0.05) 100%);
+
+  /* ---- Type ---- */
+  --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ---- Radii & shadow ---- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+  --shadow-card: 0 4px 18px rgba(0,0,0,0.35);
+  --shadow-pop: 0 12px 40px rgba(0,0,0,0.55);
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --fast: 140ms;
+  --med: 260ms;
+}
+
+* , *::before, *::after { box-sizing: border-box; }
+
+html { color-scheme: dark; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Ambient backdrop texture: faint sprocket-hole rail down the far edges,
+   evoking a filmstrip without being a literal skeuomorph. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle at 10px 10px, rgba(255,255,255,0.035) 2px, transparent 2.5px);
+  background-size: 100% 34px;
+  background-position: -20px 0;
+  opacity: 0.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0 0 .4em;
+  color: var(--text);
+}
+
+h1 { font-size: 2.1rem; text-transform: uppercase; letter-spacing: 0.03em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+
+p { margin: 0 0 .8em; color: var(--text-muted); }
+
+a { color: inherit; text-decoration: none; }
+
+button, input, select, textarea { font-family: inherit; color: inherit; }
+
+button { cursor: pointer; }
+
+::selection { background: var(--gold-dim); color: var(--text); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: var(--r-pill); border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--surface-hover); }
+
+/* Focus visibility (accessibility floor) */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* Layout helpers */
+.container {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+  h1 { font-size: 1.6rem; }
+}

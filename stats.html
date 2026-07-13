@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reel Log — Statistics</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="container">
+    <header class="page-header">
+      <div class="page-header__title-wrap">
+        <h1>Statistics</h1>
+        <p>A look back at everything you've watched.</p>
+      </div>
+    </header>
+
+    <div id="stats-loading" class="page-loader"><div class="spinner spinner-lg"></div></div>
+
+    <div id="stats-root" style="display:none;">
+      <section class="stats-grid" id="stats-grid"></section>
+
+      <div class="stats-panels">
+        <div>
+          <div class="panel">
+            <h3>Rating Distribution</h3>
+            <div id="rating-distribution"></div>
+          </div>
+          <div class="panel">
+            <h3>Most Watched Years</h3>
+            <div id="year-distribution"></div>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <h3>Favorite Genres</h3>
+            <div id="genre-distribution"></div>
+          </div>
+          <div class="panel">
+            <h3>Breakdown</h3>
+            <div class="info-card" style="border:none; padding:0;">
+              <div class="info-card__row"><span class="info-card__row-label">Movies</span><span class="info-card__row-value" id="stat-movies-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">TV Shows</span><span class="info-card__row-value" id="stat-tv-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Completed</span><span class="info-card__row-value" id="stat-completed-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Currently Watching</span><span class="info-card__row-value" id="stat-watching-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Favorites</span><span class="info-card__row-value" id="stat-fav-count"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="stats-empty" style="display:none;"></div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <script type="module" src="js/stats.js"></script>
+</body>
+</html>

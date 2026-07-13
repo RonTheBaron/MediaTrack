@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reel Log — Library</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="container">
+    <header class="page-header">
+      <div class="page-header__row">
+        <div class="page-header__title-wrap">
+          <h1>Your Library</h1>
+          <p id="library-subtitle">Loading…</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-outline" id="export-btn">Export JSON</button>
+          <button class="btn btn-outline" id="import-btn">Import JSON</button>
+          <input type="file" id="import-file-input" accept="application/json" style="display:none;" />
+          <button class="btn btn-primary" id="add-title-btn">+ Add Title</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="toolbar__search">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input class="input" type="search" id="search-input" placeholder="Search your library…" />
+      </div>
+      <div class="toolbar__filters">
+        <select class="select" id="filter-type">
+          <option value="all">All Types</option>
+          <option value="movie">Movies</option>
+          <option value="tv">TV Shows</option>
+        </select>
+        <select class="select" id="filter-genre">
+          <option value="all">All Genres</option>
+        </select>
+        <select class="select" id="filter-status">
+          <option value="all">All Statuses</option>
+          <option value="watching">Watching</option>
+          <option value="completed">Completed</option>
+          <option value="dropped">Dropped</option>
+          <option value="on_hold">On Hold</option>
+          <option value="plan_to_watch">Plan to Watch</option>
+        </select>
+        <select class="select" id="sort-select">
+          <option value="dateAdded">Recently Added</option>
+          <option value="rating">My Rating</option>
+          <option value="dateWatched">Date Watched</option>
+          <option value="releaseYear">Release Year</option>
+          <option value="alphabetical">Alphabetical</option>
+        </select>
+        <button class="chip-toggle" id="filter-favorites">
+          <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+          Favorites
+        </button>
+      </div>
+    </div>
+
+    <p class="results-count" id="results-count"></p>
+
+    <div id="library-loading" class="page-loader"><div class="spinner spinner-lg"></div></div>
+    <div id="library-grid" class="media-grid" style="display:none;"></div>
+    <div id="library-empty" style="display:none;"></div>
+    <div id="load-more-sentinel" class="load-more-sentinel" style="display:none;"><div class="spinner"></div></div>
+  </main>
+
+  <!-- Add Title modal -->
+  <div class="modal-overlay" id="add-modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
+      <div class="modal__header">
+        <h2 class="modal__title" id="add-modal-title">Add a Title</h2>
+        <button class="modal__close" id="add-modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div class="field" style="margin-bottom:14px;">
+          <input class="input" type="text" id="tmdb-search-input" placeholder="Search movies &amp; TV shows…" autocomplete="off" />
+        </div>
+        <div id="tmdb-search-status" style="min-height: 24px;"></div>
+        <div class="search-results" id="tmdb-search-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script type="module" src="js/library.js"></script>
+</body>
+</html>
