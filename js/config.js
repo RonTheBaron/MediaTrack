@@ -14,7 +14,7 @@
  * ---------------------------------------------------------------------------
  */
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBMCg-ZY6omqQ-jWAysUD9iXm5XeLv1HGM",
   authDomain: "mediatracker-5f541.firebaseapp.com",
   databaseURL: "https://mediatracker-5f541-default-rtdb.europe-west1.firebasedatabase.app",
