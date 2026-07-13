@@ -24,7 +24,7 @@ export const firebaseConfig = {
   appId: "1:1007550308490:web:68b31cb97b2584a8c54d73"
 };
 
-export const TMDB_API_KEY = "YOUR_TMDB_V3_API_KEY";
+export const TMDB_API_KEY = "854943036f1a0c02399040389bfeeac4";
 
 export const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 export const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/";
