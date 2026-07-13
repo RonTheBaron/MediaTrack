@@ -20,7 +20,7 @@ export function renderNav(activePage, user) {
       <div class="container navbar__inner">
         <a href="library.html" class="navbar__brand">
           <span class="navbar__brand-mark" aria-hidden="true"></span>
-          <span class="navbar__brand-text">Reel Log</span>
+          <span class="navbar__brand-text">Media Track</span>
         </a>
         <nav class="navbar__links">
           <a href="library.html" class="navbar__link ${activePage === "library" ? "is-active" : ""}">Library</a>
