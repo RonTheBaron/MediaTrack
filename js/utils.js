@@ -65,6 +65,25 @@ export function toDate(value) {
   return isNaN(d.getTime()) ? null : d;
 }
 
+/**
+ * Combines TMDb genres with any genres the user has manually added,
+ * de-duplicated and case-insensitively. Use this everywhere genres are
+ * displayed, filtered, or tallied so custom genres count too.
+ */
+export function allGenres(item) {
+  const tmdbGenres = item.tmdb?.genres || [];
+  const customGenres = item.user?.customGenres || [];
+  const seen = new Set();
+  const combined = [];
+  [...tmdbGenres, ...customGenres].forEach((g) => {
+    const key = g.trim().toLowerCase();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    combined.push(g.trim());
+  });
+  return combined;
+}
+
 export const WATCH_STATUS_LABELS = {
   watching: "Watching",
   completed: "Completed",

@@ -44,6 +44,7 @@ export function defaultUserFields() {
     rewatchCount: 0,
     notes: "",
     tags: [],
+    customGenres: [], // genres the user adds manually (e.g. TMDb missed one)
   };
 }
 

@@ -21,6 +21,7 @@ const docId = params.get("id");
 let uid = null;
 let item = null;
 let tags = [];
+let customGenres = [];
 
 async function init() {
   if (!docId) {
@@ -46,6 +47,7 @@ async function init() {
   }
 
   tags = [...(item.user.tags || [])];
+  customGenres = [...(item.user.customGenres || [])];
   renderPage();
   bindForm();
 
@@ -86,9 +88,11 @@ function renderPage() {
   document.getElementById("hero-status").textContent = t.status || "—";
   document.getElementById("hero-rating").textContent = t.voteAverage ? `★ ${t.voteAverage.toFixed(1)} TMDb` : "No TMDb rating";
 
-  document.getElementById("hero-genres").innerHTML = (t.genres || [])
-    .map((g) => `<span class="badge badge-genre">${escapeHtml(g)}</span>`)
-    .join("");
+  const tmdbGenreBadges = (t.genres || []).map((g) => `<span class="badge badge-genre">${escapeHtml(g)}</span>`);
+  const customGenreBadges = (u.customGenres || []).map(
+    (g) => `<span class="badge badge-genre" style="opacity:0.75;" title="Added by you">${escapeHtml(g)} ✦</span>`
+  );
+  document.getElementById("hero-genres").innerHTML = [...tmdbGenreBadges, ...customGenreBadges].join("");
 
   // Overview
   document.getElementById("overview-text").textContent = t.overview || "No description available.";
@@ -160,6 +164,7 @@ function renderPage() {
   document.getElementById("favorite-toggle").checked = !!u.favorite;
   document.getElementById("notes").value = u.notes || "";
   renderTags();
+  renderCustomGenres();
 }
 
 function updateRatingRing(value) {
@@ -185,6 +190,22 @@ function renderTags() {
   });
 }
 
+function renderCustomGenres() {
+  const wrap = document.getElementById("genre-input-wrap");
+  const input = document.getElementById("genre-input");
+  wrap.querySelectorAll(".tag-chip").forEach((el) => el.remove());
+  customGenres.forEach((genre, idx) => {
+    const chip = document.createElement("span");
+    chip.className = "tag-chip";
+    chip.innerHTML = `${escapeHtml(genre)} <button type="button" aria-label="Remove genre">&times;</button>`;
+    chip.querySelector("button").addEventListener("click", () => {
+      customGenres.splice(idx, 1);
+      renderCustomGenres();
+    });
+    wrap.insertBefore(chip, input);
+  });
+}
+
 function bindForm() {
   const ratingInput = document.getElementById("my-rating");
   ratingInput.addEventListener("input", () => updateRatingRing(Number(ratingInput.value)));
@@ -199,6 +220,19 @@ function bindForm() {
         renderTags();
       }
       tagInput.value = "";
+    }
+  });
+
+  const genreInput = document.getElementById("genre-input");
+  genreInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const val = genreInput.value.trim();
+      if (val && !customGenres.some((g) => g.toLowerCase() === val.toLowerCase())) {
+        customGenres.push(val);
+        renderCustomGenres();
+      }
+      genreInput.value = "";
     }
   });
 
@@ -220,6 +254,7 @@ async function saveChanges() {
     favorite: document.getElementById("favorite-toggle").checked,
     notes: document.getElementById("notes").value.trim(),
     tags,
+    customGenres,
   };
 
   saveBtn.disabled = true;

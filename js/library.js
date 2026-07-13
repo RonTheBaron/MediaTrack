@@ -27,6 +27,7 @@ import {
   starIcon,
   yearFrom,
   WATCH_STATUS_LABELS,
+  allGenres,
 } from "./utils.js";
 
 const PAGE_SIZE = 24;
@@ -83,7 +84,7 @@ async function loadLibrary() {
 
 function populateGenreOptions() {
   const genres = new Set();
-  state.allItems.forEach((item) => (item.tmdb.genres || []).forEach((g) => genres.add(g)));
+  state.allItems.forEach((item) => allGenres(item).forEach((g) => genres.add(g)));
   const select = els.filterGenre;
   const current = select.value;
   select.innerHTML = `<option value="all">All Genres</option>`;
@@ -120,7 +121,7 @@ function applyFiltersAndSort() {
     const t = item.tmdb;
     const u = item.user;
     if (type !== "all" && t.mediaType !== type) return false;
-    if (genre !== "all" && !(t.genres || []).includes(genre)) return false;
+    if (genre !== "all" && !allGenres(item).includes(genre)) return false;
     if (status !== "all" && u.watchStatus !== status) return false;
     if (favOnly && !u.favorite) return false;
     if (q) {
@@ -415,7 +416,7 @@ function exportLibrary() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `media-track-export-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `mediatrack-export-${new Date().toISOString().slice(0, 10)}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();

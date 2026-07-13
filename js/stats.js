@@ -12,7 +12,7 @@ import { requireAuth } from "./auth.js";
 import { renderNav } from "./nav.js";
 import { getAllMediaItems } from "./firestore.js";
 import { showToast } from "./toast.js";
-import { escapeHtml, formatWatchTime } from "./utils.js";
+import { escapeHtml, formatWatchTime, allGenres } from "./utils.js";
 
 const DEFAULT_TV_EPISODE_RUNTIME = 42;
 
@@ -135,7 +135,7 @@ function renderRatingDistribution(items) {
 function renderGenreDistribution(items) {
   const tally = new Map();
   items.forEach((i) => {
-    (i.tmdb.genres || []).forEach((g) => tally.set(g, (tally.get(g) || 0) + 1));
+    allGenres(i).forEach((g) => tally.set(g, (tally.get(g) || 0) + 1));
   });
 
   const sorted = [...tally.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
