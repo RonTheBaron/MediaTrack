@@ -30,6 +30,9 @@
   --teal-dim: #2a8578;
   --red: #e5484d;
   --red-dim: #8f2c2f;
+  --violet: #8b7ff0;
+  --violet-bright: #a79bff;
+  --violet-dim: #5b52a3;
 
   /* ---- Gradients ---- */
   --scrim: linear-gradient(180deg, rgba(10,11,15,0) 0%, rgba(10,11,15,0.55) 55%, rgba(10,11,15,0.97) 100%);

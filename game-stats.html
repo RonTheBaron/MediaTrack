@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Track — Game Statistics</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+  <div id="app-nav"></div>
+
+  <main class="container">
+    <header class="page-header">
+      <div class="page-header__title-wrap">
+        <h1>Game Statistics</h1>
+        <p>A look back at everything you've played.</p>
+      </div>
+    </header>
+
+    <div id="stats-loading" class="page-loader"><div class="spinner spinner-lg"></div></div>
+
+    <div id="stats-root" style="display:none;">
+      <section class="stats-grid" id="stats-grid"></section>
+
+      <div class="stats-panels">
+        <div>
+          <div class="panel">
+            <h3>Rating Distribution</h3>
+            <div id="rating-distribution"></div>
+          </div>
+          <div class="panel">
+            <h3>Platforms Played</h3>
+            <div id="platform-distribution"></div>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <h3>Favorite Genres</h3>
+            <div id="genre-distribution"></div>
+          </div>
+          <div class="panel">
+            <h3>Breakdown</h3>
+            <div class="info-card" style="border:none; padding:0;">
+              <div class="info-card__row"><span class="info-card__row-label">Total Games</span><span class="info-card__row-value" id="stat-total-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Completed</span><span class="info-card__row-value" id="stat-completed-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Currently Playing</span><span class="info-card__row-value" id="stat-playing-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Backlog</span><span class="info-card__row-value" id="stat-backlog-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Favorites</span><span class="info-card__row-value" id="stat-fav-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Total Endings Unlocked</span><span class="info-card__row-value" id="stat-endings-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Total Replays</span><span class="info-card__row-value" id="stat-replays-count"></span></div>
+              <div class="info-card__row"><span class="info-card__row-label">Games Where Choices Mattered</span><span class="info-card__row-value" id="stat-choices-mattered-count"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="stats-empty" style="display:none;"></div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <script type="module" src="js/game-stats.js"></script>
+</body>
+</html>

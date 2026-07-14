@@ -8,7 +8,7 @@
 import { logOut } from "./auth.js";
 
 /**
- * @param {'library'|'stats'} activePage
+ * @param {'library'|'stats'|'games'|'game-stats'} activePage
  * @param {import('firebase/auth').User} user
  */
 export function renderNav(activePage, user) {
@@ -25,6 +25,9 @@ export function renderNav(activePage, user) {
         <nav class="navbar__links">
           <a href="library.html" class="navbar__link ${activePage === "library" ? "is-active" : ""}">Library</a>
           <a href="stats.html" class="navbar__link ${activePage === "stats" ? "is-active" : ""}">Statistics</a>
+          <span class="navbar__divider" aria-hidden="true"></span>
+          <a href="games.html" class="navbar__link ${activePage === "games" ? "is-active" : ""}">Games</a>
+          <a href="game-stats.html" class="navbar__link ${activePage === "game-stats" ? "is-active" : ""}">Game Stats</a>
         </nav>
         <div class="navbar__actions">
           <span class="navbar__email">${escapeHtml(user?.email || "")}</span>

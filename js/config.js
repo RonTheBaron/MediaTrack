@@ -11,6 +11,9 @@
  *
  * 2) TMDb API key: https://www.themoviedb.org/settings/api (the "API Read
  *    Access Token" v4 auth is NOT what's used here — grab the v3 "API Key").
+ *
+ * 3) RAWG API key (for the Games section): https://rawg.io/apidocs — sign
+ *    up is free, the key shows up on your account page immediately.
  * ---------------------------------------------------------------------------
  */
 
@@ -37,3 +40,7 @@ export const IMG_SIZES = {
   backdrop: "w1280",
   profile: "w185",
 };
+
+// --- Games section (RAWG) --------------------------------------------------
+export const RAWG_API_KEY = "9c6a3866a5c14911a40800e3213b15a8";
+export const RAWG_BASE_URL = "https://api.rawg.io/api";

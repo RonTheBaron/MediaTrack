@@ -92,6 +92,32 @@ export const WATCH_STATUS_LABELS = {
   plan_to_watch: "Plan to Watch",
 };
 
+export const PLAY_STATUS_LABELS = {
+  playing: "Playing",
+  completed: "Completed",
+  dropped: "Dropped",
+  on_hold: "On Hold",
+  backlog: "Backlog",
+};
+
+/**
+ * Combines RAWG genres with any genres the user has manually added,
+ * de-duplicated and case-insensitively. Games equivalent of allGenres().
+ */
+export function allGameGenres(item) {
+  const rawgGenres = item.rawg?.genres || [];
+  const customGenres = item.user?.customGenres || [];
+  const seen = new Set();
+  const combined = [];
+  [...rawgGenres, ...customGenres].forEach((g) => {
+    const key = g.trim().toLowerCase();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    combined.push(g.trim());
+  });
+  return combined;
+}
+
 /**
  * Sets up lazy-loading for <img data-src="..."> elements within a
  * container using IntersectionObserver, with a graceful fallback to

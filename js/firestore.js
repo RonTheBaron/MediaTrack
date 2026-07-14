@@ -150,3 +150,124 @@ function toTimestampOrServer(value) {
     return serverTimestamp();
   }
 }
+
+/**
+ * ---------------------------------------------------------------------------
+ * Games (story games / visual novels / anything played rather than watched).
+ * Lives in a fully separate collection so it never mixes with movies/TV:
+ *   users/{uid}/games/{docId}   where docId = `game_${rawgId}`
+ *
+ * A document has the same two-section shape as media items:
+ *   rawg: { ...everything pulled from RAWG, never edited by the user }
+ *   user: { ...the fields the user controls: rating, status, endings, etc. }
+ * ---------------------------------------------------------------------------
+ */
+
+function gamesRef(uid) {
+  return collection(db, "users", uid, "games");
+}
+
+function gameDocId(rawgId) {
+  return `game_${rawgId}`;
+}
+
+/** Default shape for the user-editable fields on a brand-new game entry. */
+export function defaultGameUserFields() {
+  return {
+    myRating: null, // 0.5–10 in half-steps
+    playStatus: "backlog", // playing | completed | dropped | on_hold | backlog
+    dateFinished: null, // ISO date string or null
+    favorite: false,
+    replayCount: 0,
+    endingsUnlocked: 0,
+    routesCompleted: [], // free-text list of routes/paths the user has finished
+    choicesMattered: null, // true | false | null (unset) — did decisions change the story?
+    platformPlayed: "", // where the user actually played it
+    notes: "",
+    tags: [],
+    customGenres: [],
+  };
+}
+
+/** Adds a new game to the library (re-adding preserves existing user fields). */
+export async function addGameItem(uid, rawgData, userFieldOverrides = {}) {
+  const docId = gameDocId(rawgData.rawgId);
+  const ref = doc(db, "users", uid, "games", docId);
+  const existing = await getDoc(ref);
+
+  const userFields = existing.exists()
+    ? { ...existing.data().user, ...userFieldOverrides }
+    : { ...defaultGameUserFields(), ...userFieldOverrides };
+
+  await setDoc(ref, {
+    rawg: rawgData,
+    user: userFields,
+    dateAdded: existing.exists() ? existing.data().dateAdded : serverTimestamp(),
+    dateUpdated: serverTimestamp(),
+  });
+
+  return docId;
+}
+
+/** Patches only the user-editable fields of an existing game entry. */
+export async function updateGameUserFields(uid, docId, patch) {
+  const ref = doc(db, "users", uid, "games", docId);
+  const flatPatch = {};
+  Object.entries(patch).forEach(([k, v]) => {
+    flatPatch[`user.${k}`] = v;
+  });
+  flatPatch.dateUpdated = serverTimestamp();
+  await updateDoc(ref, flatPatch);
+}
+
+/** Removes a game from the library entirely. */
+export async function deleteGameItem(uid, docId) {
+  await deleteDoc(doc(db, "users", uid, "games", docId));
+}
+
+/** Fetches a single game by its document id. */
+export async function getGameItem(uid, docId) {
+  const snap = await getDoc(doc(db, "users", uid, "games", docId));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
+}
+
+/** Fetches the user's entire games library as a plain array. */
+export async function getAllGameItems(uid) {
+  const snap = await getDocs(gamesRef(uid));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+/** Serializes the full games library to a JSON string for download. */
+export function serializeGamesForExport(items) {
+  const clean = items.map((item) => ({
+    id: item.id,
+    rawg: item.rawg,
+    user: item.user,
+    dateAdded: item.dateAdded?.toDate ? item.dateAdded.toDate().toISOString() : item.dateAdded,
+    dateUpdated: item.dateUpdated?.toDate ? item.dateUpdated.toDate().toISOString() : item.dateUpdated,
+  }));
+  return JSON.stringify({ exportedAt: new Date().toISOString(), items: clean }, null, 2);
+}
+
+/** Imports a previously-exported games JSON back into Firestore. */
+export async function importGamesFromJSON(uid, jsonText) {
+  const parsed = JSON.parse(jsonText);
+  const items = Array.isArray(parsed) ? parsed : parsed.items;
+  if (!Array.isArray(items)) throw new Error("That file doesn't look like a games library export.");
+
+  let count = 0;
+  for (const item of items) {
+    if (!item.rawg || !item.user) continue;
+    const docId = item.id || gameDocId(item.rawg.rawgId);
+    const ref = doc(db, "users", uid, "games", docId);
+    await setDoc(ref, {
+      rawg: item.rawg,
+      user: item.user,
+      dateAdded: toTimestampOrServer(item.dateAdded),
+      dateUpdated: serverTimestamp(),
+    });
+    count++;
+  }
+  return count;
+}
