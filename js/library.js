@@ -26,6 +26,7 @@ import {
   heartIcon,
   starIcon,
   yearFrom,
+  formatRuntime,
   WATCH_STATUS_LABELS,
   allGenres,
 } from "./utils.js";
@@ -52,6 +53,7 @@ const els = {
   filterStatus: document.getElementById("filter-status"),
   sortSelect: document.getElementById("sort-select"),
   filterFav: document.getElementById("filter-favorites"),
+  timeFinderBtn: document.getElementById("time-finder-btn"),
 };
 
 let observer = null;
@@ -64,6 +66,7 @@ async function init() {
   bindToolbar();
   bindAddModal();
   bindImportExport();
+  bindTimeFinder();
 }
 
 async function loadLibrary() {
@@ -422,6 +425,105 @@ function exportLibrary() {
   a.remove();
   URL.revokeObjectURL(url);
   showToast("Library exported.", "success");
+}
+
+/* ------------------------------------------------------------ Time Finder */
+const EPISODE_TRIM_MINUTES = 4;
+
+/**
+ * Estimated total watch time for an item, in minutes, or null if unknown.
+ * Movies: TMDb runtime as-is.
+ * TV shows: numberOfEpisodes * (episodeRunTime - 4), floored at 0 per episode.
+ */
+function estimatedRuntimeMinutes(item) {
+  const t = item.tmdb;
+  if (!t) return null;
+
+  if (t.mediaType === "movie") {
+    return typeof t.runtime === "number" && t.runtime > 0 ? t.runtime : null;
+  }
+
+  // TV show
+  const episodes = t.numberOfEpisodes;
+  const perEpisode = t.episodeRunTime;
+  if (!episodes || !perEpisode) return null;
+  const trimmed = Math.max(0, perEpisode - EPISODE_TRIM_MINUTES);
+  return episodes * trimmed;
+}
+
+function bindTimeFinder() {
+  const overlay = document.getElementById("time-modal-overlay");
+  const closeBtn = document.getElementById("time-modal-close");
+  const findBtn = document.getElementById("time-find-btn");
+  const hoursInput = document.getElementById("time-hours-input");
+  const minutesInput = document.getElementById("time-minutes-input");
+  const resultEl = document.getElementById("time-result");
+
+  els.timeFinderBtn.addEventListener("click", () => {
+    overlay.classList.add("is-open");
+    resultEl.innerHTML = "";
+    setTimeout(() => hoursInput.focus(), 60);
+  });
+  closeBtn.addEventListener("click", () => overlay.classList.remove("is-open"));
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.classList.remove("is-open");
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && overlay.classList.contains("is-open")) overlay.classList.remove("is-open");
+  });
+
+  findBtn.addEventListener("click", () => {
+    const hours = Math.max(0, parseInt(hoursInput.value, 10) || 0);
+    const minutes = Math.max(0, parseInt(minutesInput.value, 10) || 0);
+    const budget = hours * 60 + minutes;
+
+    if (budget <= 0) {
+      resultEl.innerHTML = `<p style="color:var(--text-dim);">Enter how much time you've got first.</p>`;
+      return;
+    }
+
+    const candidates = state.allItems.filter((item) => {
+      const est = estimatedRuntimeMinutes(item);
+      return est !== null && est <= budget;
+    });
+
+    if (candidates.length === 0) {
+      resultEl.innerHTML = `
+        <div class="empty-state" style="padding:24px 0;">
+          <p>Nothing in your library fits in ${formatRuntime(budget)}.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const pick = candidates[Math.floor(Math.random() * candidates.length)];
+    renderTimeResult(pick, resultEl);
+  });
+}
+
+function renderTimeResult(item, resultEl) {
+  const t = item.tmdb;
+  const est = estimatedRuntimeMinutes(item);
+  const poster = tmdbImage(t.posterPath, "w185");
+  const typeLabel = t.mediaType === "movie" ? "Movie" : "TV Show";
+  const detail =
+    t.mediaType === "movie"
+      ? formatRuntime(est)
+      : `${t.numberOfEpisodes} episodes · ~${formatRuntime(est)} total`;
+
+  resultEl.innerHTML = `
+    <div class="search-result-row" id="time-result-row" tabindex="0" style="cursor:pointer;">
+      ${poster ? `<img src="${poster}" alt="" loading="lazy" />` : `<div style="width:44px;height:64px;background:var(--surface-2);border-radius:6px;flex-shrink:0;"></div>`}
+      <div class="search-result-row__info">
+        <div class="search-result-row__title">${escapeHtml(t.title)}</div>
+        <div class="search-result-row__meta">${yearFrom(t.releaseDate)} · ${typeLabel} · ${detail}</div>
+      </div>
+      <span class="badge">${typeLabel}</span>
+    </div>
+  `;
+  document.getElementById("time-result-row").addEventListener("click", () => {
+    window.location.href = `details.html?id=${encodeURIComponent(item.id)}`;
+  });
 }
 
 init();
