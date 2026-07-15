@@ -62,7 +62,7 @@
         </button>
         <button class="chip-toggle" id="time-finder-btn">
           <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
-          I Have Time
+          <span id="time-finder-label">Time Available</span>
         </button>
       </div>
     </div>
@@ -92,7 +92,7 @@
     </div>
   </div>
 
-  <!-- Time Finder modal -->
+  <!-- Time Filter modal -->
   <div class="modal-overlay" id="time-modal-overlay">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="time-modal-title">
       <div class="modal__header">
@@ -110,9 +110,11 @@
             <input class="input" type="number" id="time-minutes-input" min="0" max="59" step="1" placeholder="30" />
           </div>
         </div>
-        <p class="hint" style="margin-bottom:16px;">Estimates TV shows at 4 fewer minutes per episode (for intros/credits/skipping). Searches your whole library.</p>
-        <button class="btn btn-primary" id="time-find-btn" style="width:100%;">Find Something to Watch</button>
-        <div id="time-result" style="margin-top:18px;"></div>
+        <p class="hint" style="margin-bottom:16px;">Shows everything in your library that fits in this much time. TV shows are estimated at 4 fewer minutes per episode (for intros/credits/skipping).</p>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" id="time-clear-btn" style="flex:1;">Clear</button>
+          <button class="btn btn-primary" id="time-apply-btn" style="flex:2;">Show Matching Titles</button>
+        </div>
       </div>
     </div>
   </div>
