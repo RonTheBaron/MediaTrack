@@ -60,6 +60,10 @@
           <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
           Favorites
         </button>
+        <button class="chip-toggle" id="time-finder-btn">
+          <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+          I Have Time
+        </button>
       </div>
     </div>
 
@@ -84,6 +88,31 @@
         </div>
         <div id="tmdb-search-status" style="min-height: 24px;"></div>
         <div class="search-results" id="tmdb-search-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Time Finder modal -->
+  <div class="modal-overlay" id="time-modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="time-modal-title">
+      <div class="modal__header">
+        <h2 class="modal__title" id="time-modal-title">How Much Time Do You Have?</h2>
+        <button class="modal__close" id="time-modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div style="display:flex; gap:12px; margin-bottom:6px;">
+          <div class="field" style="flex:1; margin-bottom:0;">
+            <label for="time-hours-input">Hours</label>
+            <input class="input" type="number" id="time-hours-input" min="0" step="1" placeholder="0" />
+          </div>
+          <div class="field" style="flex:1; margin-bottom:0;">
+            <label for="time-minutes-input">Minutes</label>
+            <input class="input" type="number" id="time-minutes-input" min="0" max="59" step="1" placeholder="30" />
+          </div>
+        </div>
+        <p class="hint" style="margin-bottom:16px;">Estimates TV shows at 4 fewer minutes per episode (for intros/credits/skipping). Searches your whole library.</p>
+        <button class="btn btn-primary" id="time-find-btn" style="width:100%;">Find Something to Watch</button>
+        <div id="time-result" style="margin-top:18px;"></div>
       </div>
     </div>
   </div>
