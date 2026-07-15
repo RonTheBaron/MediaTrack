@@ -38,6 +38,7 @@ const state = {
   allItems: [],
   filtered: [],
   visibleCount: PAGE_SIZE,
+  timeBudgetMinutes: null, // null = filter inactive
 };
 
 const els = {
@@ -54,6 +55,7 @@ const els = {
   sortSelect: document.getElementById("sort-select"),
   filterFav: document.getElementById("filter-favorites"),
   timeFinderBtn: document.getElementById("time-finder-btn"),
+  timeFinderLabel: document.getElementById("time-finder-label"),
 };
 
 let observer = null;
@@ -119,6 +121,7 @@ function applyFiltersAndSort() {
   const status = els.filterStatus.value;
   const favOnly = els.filterFav.classList.contains("is-active");
   const sortBy = els.sortSelect.value;
+  const timeBudget = state.timeBudgetMinutes;
 
   let items = state.allItems.filter((item) => {
     const t = item.tmdb;
@@ -127,6 +130,10 @@ function applyFiltersAndSort() {
     if (genre !== "all" && !allGenres(item).includes(genre)) return false;
     if (status !== "all" && u.watchStatus !== status) return false;
     if (favOnly && !u.favorite) return false;
+    if (timeBudget !== null) {
+      const est = estimatedRuntimeMinutes(item);
+      if (est === null || est > timeBudget) return false;
+    }
     if (q) {
       const hay = `${t.title} ${t.originalTitle || ""}`.toLowerCase();
       if (!hay.includes(q)) return false;
@@ -233,7 +240,9 @@ function cardHtml(item) {
         <div class="media-card__meta">
           <span>${yearFrom(t.releaseDate)}</span>
           ${
-            u.myRating
+            state.timeBudgetMinutes !== null
+              ? `<span>${formatRuntime(estimatedRuntimeMinutes(item))}</span>`
+              : u.myRating
               ? `<span class="media-card__my-rating">${starIcon()}${u.myRating}</span>`
               : `<span>${WATCH_STATUS_LABELS[u.watchStatus] || ""}</span>`
           }
@@ -427,7 +436,7 @@ function exportLibrary() {
   showToast("Library exported.", "success");
 }
 
-/* ------------------------------------------------------------ Time Finder */
+/* ------------------------------------------------------------ Time Filter */
 const EPISODE_TRIM_MINUTES = 4;
 
 /**
@@ -454,14 +463,18 @@ function estimatedRuntimeMinutes(item) {
 function bindTimeFinder() {
   const overlay = document.getElementById("time-modal-overlay");
   const closeBtn = document.getElementById("time-modal-close");
-  const findBtn = document.getElementById("time-find-btn");
+  const applyBtn = document.getElementById("time-apply-btn");
+  const clearBtn = document.getElementById("time-clear-btn");
   const hoursInput = document.getElementById("time-hours-input");
   const minutesInput = document.getElementById("time-minutes-input");
-  const resultEl = document.getElementById("time-result");
+
+  if (!els.timeFinderBtn || !overlay || !closeBtn || !applyBtn || !clearBtn || !hoursInput || !minutesInput) {
+    console.error("Time Filter: one or more expected elements are missing from the DOM.");
+    return;
+  }
 
   els.timeFinderBtn.addEventListener("click", () => {
     overlay.classList.add("is-open");
-    resultEl.innerHTML = "";
     setTimeout(() => hoursInput.focus(), 60);
   });
   closeBtn.addEventListener("click", () => overlay.classList.remove("is-open"));
@@ -472,58 +485,41 @@ function bindTimeFinder() {
     if (e.key === "Escape" && overlay.classList.contains("is-open")) overlay.classList.remove("is-open");
   });
 
-  findBtn.addEventListener("click", () => {
+  applyBtn.addEventListener("click", () => {
     const hours = Math.max(0, parseInt(hoursInput.value, 10) || 0);
     const minutes = Math.max(0, parseInt(minutesInput.value, 10) || 0);
     const budget = hours * 60 + minutes;
 
     if (budget <= 0) {
-      resultEl.innerHTML = `<p style="color:var(--text-dim);">Enter how much time you've got first.</p>`;
+      showToast("Enter how much time you've got first.", "info");
       return;
     }
 
-    const candidates = state.allItems.filter((item) => {
-      const est = estimatedRuntimeMinutes(item);
-      return est !== null && est <= budget;
-    });
+    state.timeBudgetMinutes = budget;
+    updateTimeFinderButtonState();
+    overlay.classList.remove("is-open");
+    applyFiltersAndSort();
+  });
 
-    if (candidates.length === 0) {
-      resultEl.innerHTML = `
-        <div class="empty-state" style="padding:24px 0;">
-          <p>Nothing in your library fits in ${formatRuntime(budget)}.</p>
-        </div>
-      `;
-      return;
-    }
-
-    const pick = candidates[Math.floor(Math.random() * candidates.length)];
-    renderTimeResult(pick, resultEl);
+  clearBtn.addEventListener("click", () => {
+    state.timeBudgetMinutes = null;
+    hoursInput.value = "";
+    minutesInput.value = "";
+    updateTimeFinderButtonState();
+    overlay.classList.remove("is-open");
+    applyFiltersAndSort();
   });
 }
 
-function renderTimeResult(item, resultEl) {
-  const t = item.tmdb;
-  const est = estimatedRuntimeMinutes(item);
-  const poster = tmdbImage(t.posterPath, "w185");
-  const typeLabel = t.mediaType === "movie" ? "Movie" : "TV Show";
-  const detail =
-    t.mediaType === "movie"
-      ? formatRuntime(est)
-      : `${t.numberOfEpisodes} episodes · ~${formatRuntime(est)} total`;
-
-  resultEl.innerHTML = `
-    <div class="search-result-row" id="time-result-row" tabindex="0" style="cursor:pointer;">
-      ${poster ? `<img src="${poster}" alt="" loading="lazy" />` : `<div style="width:44px;height:64px;background:var(--surface-2);border-radius:6px;flex-shrink:0;"></div>`}
-      <div class="search-result-row__info">
-        <div class="search-result-row__title">${escapeHtml(t.title)}</div>
-        <div class="search-result-row__meta">${yearFrom(t.releaseDate)} · ${typeLabel} · ${detail}</div>
-      </div>
-      <span class="badge">${typeLabel}</span>
-    </div>
-  `;
-  document.getElementById("time-result-row").addEventListener("click", () => {
-    window.location.href = `details.html?id=${encodeURIComponent(item.id)}`;
-  });
+function updateTimeFinderButtonState() {
+  const budget = state.timeBudgetMinutes;
+  if (budget === null) {
+    els.timeFinderBtn.classList.remove("is-active");
+    els.timeFinderLabel.textContent = "Time Available";
+  } else {
+    els.timeFinderBtn.classList.add("is-active");
+    els.timeFinderLabel.textContent = `≤ ${formatRuntime(budget)}`;
+  }
 }
 
 init();
